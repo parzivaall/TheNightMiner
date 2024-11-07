@@ -7,11 +7,14 @@ public class EnvManager : MonoBehaviour
 {
     public static EnvManager Instance;
     private int score = 0;
+    private int rock = 0;
     private int maxHealth = 100;
     private int health;
-    public AudioSource musicSource;
-    public AudioClip[] sceneMusicTracks; // Assign different music clips for each scene
+    public AudioSource damageSFX;
     private string currentSceneName;
+    public TextAnimator textAnimator;
+    public MusicOrganizer musicOrganizer;
+    public List<int> highscores = new List<int>();
 
     private void Awake()
     {
@@ -26,14 +29,24 @@ public class EnvManager : MonoBehaviour
         currentSceneName = SceneManager.GetActiveScene().name;
 
         // Play the music for the initial scene
-        PlaySceneMusic(currentSceneName);
+        musicOrganizer.PlaySceneMusic(currentSceneName);
 
         // Subscribe to scene change event
         SceneManager.sceneLoaded += OnSceneLoaded;
+
+        for (int i = 0; i < 3; i++){
+            if (PlayerPrefs.HasKey("Highscore: " + (i+1))){
+                highscores.Add(PlayerPrefs.GetInt("Highscore: " + (i+1), 0));
+            } else{
+                highscores.Add(0);
+            }
+        }
+
+
     }
 
     void start(){
-        maxHealth = maxHealth;
+        health = maxHealth;
     }
 
     void OnDestroy()
@@ -51,62 +64,30 @@ public class EnvManager : MonoBehaviour
             currentSceneName = scene.name;
 
             // Play the appropriate music for the new scene
-            PlaySceneMusic(currentSceneName);
-        }
-    }
-
-    void PlaySceneMusic(string sceneName)
-    {
-        // Select the appropriate music track for the scene
-        AudioClip trackToPlay = null;
-
-        switch (sceneName)
-        {
-            case "MainMenu":
-                trackToPlay = sceneMusicTracks[0]; // Assign the corresponding track index
-                break;
-            case "Shop":
-                trackToPlay = sceneMusicTracks[1];
-                break;
-            case "Cave":
-                trackToPlay = sceneMusicTracks[2];
-                break;
-            default:
-                trackToPlay = sceneMusicTracks[0]; // Default to first track if none specified
-                break;
-        }
-
-        // Only play if it's a new track
-        if (musicSource.clip != trackToPlay)
-        {
-            StartCoroutine(CrossfadeToNewTrack(trackToPlay));
-        }
-    }
-
-    System.Collections.IEnumerator CrossfadeToNewTrack(AudioClip newTrack)
-    {
-        // Fade out current track
-        for (float volume = musicSource.volume; volume > 0; volume -= Time.deltaTime)
-        {
-            musicSource.volume = volume;
-            yield return null;
-        }
-
-        // Switch tracks and fade in the new track
-        musicSource.clip = newTrack;
-        musicSource.Play();
-
-        for (float volume = 0; volume < 1f; volume += Time.deltaTime)
-        {
-            musicSource.volume = volume;
-            yield return null;
+            musicOrganizer.PlaySceneMusic(currentSceneName);
         }
     }
 
     public void setHealth(int damage)
     {
         health += damage;
-        if (health <= 0) { SceneManager.LoadScene(3); }
+        textAnimator.AnimateDamage();
+        damageSFX.Play();
+        if (health <= 0) { 
+            if (score > highscores[2])
+            {
+                highscores[2] = score;
+            }
+            highscores.Sort();
+            for (int i = 0; i < 3; i++){
+                PlayerPrefs.SetInt("Highscore: " + (i+1), highscores[i]);
+            }
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            setRock(0);
+            setScore(0);
+            setHealth(100);
+            LoadScene(3); }
         else if (health > 100) { health = 100; }
     }
 
@@ -121,6 +102,22 @@ public class EnvManager : MonoBehaviour
     public void addScore(int amount)
     {
         score += amount;
+        textAnimator.AnimateAlert("Score: " + score);
+    }
+
+    public int getRock(){
+        return rock;
+        textAnimator.AnimateAlert("Rock: " + rock);
+    }
+    public void addRock(int amount)
+    {
+        rock += amount;
+        textAnimator.AnimateAlert("Rock: " + rock);
+        Debug.Log("addRock: " + amount);
+    }
+    public void setRock(int amount)
+    {
+        rock = amount;
     }
 
     public int getHealth()
@@ -132,4 +129,10 @@ public class EnvManager : MonoBehaviour
 
         SceneManager.LoadScene(level);
     }
+
+    public void text(string textToAppear){
+        textAnimator.AnimateText(textToAppear);
+    }
+
+
 }

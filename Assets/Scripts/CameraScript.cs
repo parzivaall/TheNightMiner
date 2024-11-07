@@ -3,7 +3,7 @@ using UnityEngine;
 public class FirstPersonCamera : MonoBehaviour
 {
     [Header("Camera Settings")]
-    [SerializeField] private float mouseSensitivity = 3f;
+    [SerializeField] public float mouseSensitivity = 3f;
     [SerializeField] private float maxLookAngle = 90f;
 
     [Header("References")]
@@ -14,20 +14,27 @@ public class FirstPersonCamera : MonoBehaviour
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        if (PlayerPrefs.HasKey("Sensitivity"))
+        {
+            mouseSensitivity = PlayerPrefs.GetFloat("Sensitivity");
+        }
     }
 
     private void Update()
     {
-        // Get mouse input
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+        if (!ExitMenu.GameIsPaused){
+            // Get mouse input
+            float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+            float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
-        // Rotate the player body horizontally
-        playerBody.Rotate(Vector3.up * mouseX);
+            // Rotate the player body horizontally
+            playerBody.Rotate(Vector3.up * mouseX);
 
-        // Rotate the camera vertically
-        xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -maxLookAngle, maxLookAngle);
-        transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+            // Rotate the camera vertically
+            xRotation -= mouseY;
+            xRotation = Mathf.Clamp(xRotation, -maxLookAngle, maxLookAngle);
+            transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        }
     }
 }

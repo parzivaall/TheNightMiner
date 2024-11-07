@@ -34,6 +34,7 @@ public class PlayerController : MonoBehaviour
                 StartCoroutine(SwingPickaxe());
                 swinging = true;
             
+
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition-new Vector3(0, Screen.height, 0));
                 RaycastHit hit;
                 if(Physics.Raycast(ray, out hit, 5f)) // added a max distance of 3f
@@ -45,14 +46,13 @@ public class PlayerController : MonoBehaviour
                     if(hit.transform.tag == "Rock"){
                         Destroy(hit.transform.gameObject);
                         Instantiate(pickaxeParticle, point, Quaternion.identity);
-                        
+                        EnvManager.Instance.addRock(1);
                     }
                     if(hit.transform.tag == "Enemy"){
                         Destroy(hit.transform.gameObject);
                         Instantiate(pickaxeParticle, point, Quaternion.identity);
                     }
                 
-
                 }
             
             }

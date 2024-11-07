@@ -14,4 +14,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Caves.unity
     guid: 0e113a5fa1b9400b2b5a378ba7c58883
+  - enabled: 1
+    path: Assets/Scenes/Death.unity
+    guid: cda7087039d0fdbe28a4c67746bd04af
+  - enabled: 1
+    path: Assets/Scenes/Purgatory.unity
+    guid: 2b3282b001fcb3ea5ac225f72d903eee
   m_configObjects: {}
