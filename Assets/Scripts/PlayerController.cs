@@ -12,15 +12,24 @@ public class PlayerController : MonoBehaviour
     public GameObject pickaxe;
     public ParticleSystem pickaxeParticle;
     private bool swinging = false;
+    public Camera mainCamera;
+    
+    private Rigidbody _rb;
+
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        // Fallback if Main Camera tag is missing
+        if (mainCamera == null)
+        {
+            mainCamera = FindObjectOfType<Camera>();
+        }
+        _rb = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         horizontalInput = Input.GetAxis("Horizontal");
         forwardInput = Input.GetAxis("Vertical");
@@ -28,38 +37,37 @@ public class PlayerController : MonoBehaviour
         transform.Translate(Vector3.forward * Time.deltaTime * speed * forwardInput);
         transform.Translate(Vector3.right * Time.deltaTime * speed * horizontalInput);
 
-        if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))
         {
-            if(swinging == false){
+            if (!swinging)
+            {
                 StartCoroutine(SwingPickaxe());
                 swinging = true;
-            
 
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition-new Vector3(0, Screen.height, 0));
+                Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
-                if(Physics.Raycast(ray, out hit, 5f)) // added a max distance of 3f
+                if (Physics.Raycast(ray, out hit, 5f)) // corrected the max distance to 5f
                 {
                     Vector3 point = hit.point;
                     point.y += 0.1f;
                     pickaxeSound.Play();
                     Instantiate(pickaxeParticle, point, Quaternion.identity);
-                    if(hit.transform.tag == "Rock"){
+                    if (hit.transform.CompareTag("Rock"))
+                    {
                         Destroy(hit.transform.gameObject);
                         Instantiate(pickaxeParticle, point, Quaternion.identity);
                         EnvManager.Instance.addRock(1);
                     }
-                    if(hit.transform.tag == "Enemy"){
+                    if (hit.transform.CompareTag("Enemy"))
+                    {
                         Destroy(hit.transform.gameObject);
                         Instantiate(pickaxeParticle, point, Quaternion.identity);
                     }
-                
                 }
-            
             }
-        
-        
         }
     }
+
 
     IEnumerator SwingPickaxe()
     {
@@ -87,3 +95,4 @@ public class PlayerController : MonoBehaviour
         swinging = false;
     }
 }
+

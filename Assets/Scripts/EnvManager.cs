@@ -74,9 +74,9 @@ public class EnvManager : MonoBehaviour
         textAnimator.AnimateDamage();
         damageSFX.Play();
         if (health <= 0) { 
-            if (score > highscores[2])
+            if (score > highscores[0])
             {
-                highscores[2] = score;
+                highscores[0] = score;
             }
             highscores.Sort();
             for (int i = 0; i < 3; i++){

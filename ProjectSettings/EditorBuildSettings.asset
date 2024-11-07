@@ -20,4 +20,5 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Purgatory.unity
     guid: 2b3282b001fcb3ea5ac225f72d903eee
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.input.settings: {fileID: 11400000, guid: 1876f9d1d39f0c9eb8113d551308eec1, type: 2}
